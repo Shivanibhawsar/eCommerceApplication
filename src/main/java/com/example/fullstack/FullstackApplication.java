@@ -3,10 +3,8 @@ package com.example.fullstack;
 import com.example.fullstack.models.Product;
 import com.example.fullstack.repository.ProductRepository;
 import com.mongodb.*;
+import com.mongodb.client.*;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import org.apache.catalina.User;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -17,6 +15,8 @@ import org.bson.conversions.Bson;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -45,6 +45,10 @@ public class FullstackApplication {
 			MongoDatabase mongoDatabase = mongoClient.getDatabase("test");
 			MongoCollection productCollection = mongoDatabase.getCollection("product", Product.class);
 
+			Query query = new Query();
+			BasicDBObject query1 = new BasicDBObject("image", "book.png");
+			query.addCriteria(Criteria.where("lastName").is("Paul"));
+			//query.addCriteria()
 			Product product = new Product();
 			product.setTitle("Book");
 			product.setPrice("12.14$");
@@ -54,7 +58,14 @@ public class FullstackApplication {
 			product.setReviews(1234);
 
 			productCollection.insertOne(product);
+			DBCursor cursor = productCollection.find(query1, Product.class);
 
+
+			while(cursor.hasNext())
+			{
+				System.out.println(cursor.next());
+			}
+			cursor.close();
 
 		//ConnectionString connectionString = new ConnectionString(uri);
 	//	CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
